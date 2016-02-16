@@ -29,6 +29,8 @@ FILE *inputFile;
 void	initTrain ( char *filename )
 {
 	doRandom = 0;
+
+        char ch;
 	
 	/* If no filename is specified, generate randomly */
 	if ( !filename )
@@ -40,9 +42,16 @@ void	initTrain ( char *filename )
 	{
 		/* remove this line and add your code here */
 		printf ("File input not implemented.\n");
-	}
+
+                inputFile = fopen(filename,"r");
+
+                while( ( ch = fgetc(inputFile) ) != EOF )
+                  printf("%c",ch);
+
+                fclose(inputFile);
+        }
 }
- 
+
 /*
  * Allocate a new train structure with a new trainId, trainIds are
  * assigned consecutively, starting at 0
@@ -54,24 +63,24 @@ void	initTrain ( char *filename )
  */
 TrainInfo *createTrain ( void )
 {
-	TrainInfo *info = (TrainInfo *)malloc(sizeof(TrainInfo));
+  TrainInfo *info = (TrainInfo *)malloc(sizeof(TrainInfo));
 
-	/* I'm assigning the random values here in case
-	 * there is a problem with the input file.  Then
-	 * at least we know all the fields are initialized.
-	 */	 
-	info->trainId = idNumber++;
-	info->arrival = 0;
-	info->direction = (random() % 2 + 1);
-	info->length = (random() % MAX_LENGTH) + MIN_LENGTH;
+  /* I'm assigning the random values here in case
+   * there is a problem with the input file.  Then
+   * at least we know all the fields are initialized.
+   */	 
+  info->trainId = idNumber++;
+  info->arrival = 0;
+  info->direction = (random() % 2 + 1);
+  info->length = (random() % MAX_LENGTH) + MIN_LENGTH;
 
-	if (!doRandom)
-	{
-		/* Your code here to read a line of input
-		 * from the input file 
-		 */
-	}
-	return info;
+  if (!doRandom)
+  {
+    /* Your code here to read a line of input
+     * from the input file 
+     */
+  }
+  return info;
 }
 
 
