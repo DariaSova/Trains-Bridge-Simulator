@@ -76,15 +76,17 @@ TrainInfo *createTrain ( void )
   {
     int length;
     char *current;
-    while( (fgets(ch, 82, inputFile) ) != NULL ){
+    if ((fgets(ch, 82, inputFile) ) != NULL) {
       current = ch;
-      printf("LINE:%s\n", ch);
       current++;
-      printf("LENGTH:%s\n", current);
-      info->direction = ch[0];
-      printf("DIRECTION:%c\n",ch[0]);
+      if(ch[0]=='W'){
+        info->direction = 1;
+      }
+      else if(ch[0]=='E'){
+        info->direction = 2;
+      }
       length = atoi(current);
-      printf("INT:%d\n",length);
+      info->length = length;
     }
 
     /* Your code here to read a line of input
