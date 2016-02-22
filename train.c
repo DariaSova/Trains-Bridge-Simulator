@@ -20,6 +20,7 @@ int doRandom = 0;
 
 /* The file to input train data from */
 FILE *inputFile;
+char ch[80];
 
 /* You can assume that no more than 80 characters
  * will be on any line in the input file
@@ -30,7 +31,6 @@ void	initTrain ( char *filename )
 {
 	doRandom = 0;
 
-        char ch;
 	
 	/* If no filename is specified, generate randomly */
 	if ( !filename )
@@ -41,14 +41,11 @@ void	initTrain ( char *filename )
 	else
 	{
 		/* remove this line and add your code here */
-		printf ("File input not implemented.\n");
+		printf ("File input not implemented. [%d]\n", doRandom);
 
                 inputFile = fopen(filename,"r");
 
-                while( ( ch = fgetc(inputFile) ) != EOF )
-                  printf("%c",ch);
-
-                fclose(inputFile);
+                //fclose(inputFile);
         }
 }
 
@@ -74,8 +71,22 @@ TrainInfo *createTrain ( void )
   info->direction = (random() % 2 + 1);
   info->length = (random() % MAX_LENGTH) + MIN_LENGTH;
 
+
   if (!doRandom)
   {
+    int length;
+    char *current;
+    while( (fgets(ch, 82, inputFile) ) != NULL ){
+      current = ch;
+      printf("LINE:%s\n", ch);
+      current++;
+      printf("LENGTH:%s\n", current);
+      info->direction = ch[0];
+      printf("DIRECTION:%c\n",ch[0]);
+      length = atoi(current);
+      printf("INT:%d\n",length);
+    }
+
     /* Your code here to read a line of input
      * from the input file 
      */
