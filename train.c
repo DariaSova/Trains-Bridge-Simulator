@@ -40,10 +40,8 @@ void	initTrain ( char *filename )
 	}
 	else
 	{
-		/* remove this line and add your code here */
-		printf ("File input not implemented. [%d]\n", doRandom);
 
-                inputFile = fopen(filename,"r");
+                inputFile = fopen(filename, "r");
 
                 //fclose(inputFile);
         }
@@ -79,21 +77,15 @@ TrainInfo *createTrain ( void )
     if ((fgets(ch, 82, inputFile) ) != NULL) {
       current = ch;
       current++;
-      if(ch[0]=='W'){
+      if(ch[0]=='W' || ch[0]=='w'){
         info->direction = 1;
       }
-      else if(ch[0]=='E'){
+      else if(ch[0]=='E' || ch[0]=='e'){
         info->direction = 2;
       }
       length = atoi(current);
       info->length = length;
     }
-
-    /* Your code here to read a line of input
-     * from the input file 
-     */
   }
   return info;
 }
-
-
