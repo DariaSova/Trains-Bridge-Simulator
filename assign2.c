@@ -11,6 +11,10 @@
 #include <pthread.h>
 #include "train.h"
 
+pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t c = PTHREAD_COND_INITIALIZER;
+int turn=0;
+
 /*
  * If you uncomment the following line, some debugging
  * output will be produced.
@@ -61,6 +65,12 @@ void ArriveBridge ( TrainInfo *train )
 	printf ("Train %2d arrives going %s\n", train->trainId, 
 			(train->direction == DIRECTION_WEST ? "West" : "East"));
 	/* Your code here... */
+        pthread_mutex_lock(&m);
+        while(turn!=train->trainId){
+          pthread_cond_wait(&c,&m);
+        }
+        pthread_mutex_unlock(&m);
+
 }
 
 /*
@@ -90,6 +100,10 @@ void CrossBridge ( TrainInfo *train )
  */
 void LeaveBridge ( TrainInfo *train )
 {
+  pthread_mutex_lock(&m);
+  turn++;
+  pthread_cond_broadcast(&c);
+  pthread_mutex_unlock(&m);
 
 }
 
