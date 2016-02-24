@@ -14,7 +14,14 @@
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 int turn=0;
+int e_count_max=0;
+int e_count=0;
+int w_count=0;
 
+struct node {
+  int id;
+  struct node *next;
+}*East, *West, *west_temp, *east_temp;
 /*
  * If you uncomment the following line, some debugging
  * output will be produced.
@@ -64,7 +71,29 @@ void ArriveBridge ( TrainInfo *train )
 {
 	printf ("Train %2d arrives going %s\n", train->trainId, 
 			(train->direction == DIRECTION_WEST ? "West" : "East"));
-	/* Your code here... */
+
+        //put all trains in queues
+        pthread_mutex_lock(&m);
+
+        struct node *current = (struct node *)malloc(1*sizeof(struct node));
+        current->id = train->trainId;
+
+        if(train->direction == 2) {
+          if(e_count==0)
+            East = current;
+          else east_temp->next = current;
+          east_temp = current;
+          e_count++;
+        }else {
+          if(w_count==0)
+            West = current;
+          else west_temp->next = current;
+          west_temp = current;
+          w_count++;
+        }
+
+        pthread_mutex_unlock(&m);
+
         pthread_mutex_lock(&m);
         while(turn!=train->trainId){
           pthread_cond_wait(&c,&m);
