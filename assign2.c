@@ -13,7 +13,7 @@
 
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
-int turn_id=0;
+int turn_id=-1;
 int e_count_max=0;
 int e_count=0;
 int w_count=0;
@@ -88,6 +88,10 @@ void ArriveBridge ( TrainInfo *train )
           else west_temp->next = current;
           west_temp = current;
           w_count++;
+        }
+        
+        if(turn_id==-1) {
+          turn_id = train -> trainId;
         }
 
         pthread_mutex_unlock(&m);
