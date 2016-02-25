@@ -13,7 +13,7 @@
 
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
-int turn=0;
+int turn_id=0;
 int e_count_max=0;
 int e_count=0;
 int w_count=0;
@@ -29,7 +29,7 @@ struct node {
  * Be sure to comment this line out again before you submit 
  */
 
-/* #define DEBUG	1 */
+/* #define DEBUG	1 */ 
 
 void ArriveBridge (TrainInfo *train);
 void CrossBridge (TrainInfo *train);
@@ -77,6 +77,7 @@ void ArriveBridge ( TrainInfo *train )
 
         struct node *current = (struct node *)malloc(1*sizeof(struct node));
         current->id = train->trainId;
+        current->next = NULL;
 
         if(train->direction == 2) {
           if(e_count==0)
@@ -95,7 +96,7 @@ void ArriveBridge ( TrainInfo *train )
         pthread_mutex_unlock(&m);
 
         pthread_mutex_lock(&m);
-        while(turn!=train->trainId){
+        while(turn_id!=train->trainId){
           pthread_cond_wait(&c,&m);
         }
         pthread_mutex_unlock(&m);
@@ -130,7 +131,27 @@ void CrossBridge ( TrainInfo *train )
 void LeaveBridge ( TrainInfo *train )
 {
   pthread_mutex_lock(&m);
-  turn++;
+
+  //west train
+  if(train->direction==1){
+    if(West->next)
+      West = West->next;
+    w_count--;
+    //reset the max east tran counter
+    e_count_max=0;
+  }else{
+    if(East->next)
+      East = East->next;
+    e_count--;
+    e_count_max++;
+  }
+
+  if((e_count_max >=2 || e_count==0) && w_count!=0){
+    turn_id = West->id;
+  }else {
+    turn_id = East->id;
+  }
+
   pthread_cond_broadcast(&c);
   pthread_mutex_unlock(&m);
 
