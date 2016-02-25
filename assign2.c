@@ -69,9 +69,6 @@ void * Train ( void *arguments )
  */
 void ArriveBridge ( TrainInfo *train )
 {
-	printf ("Train %2d arrives going %s\n", train->trainId, 
-			(train->direction == DIRECTION_WEST ? "West" : "East"));
-
         //put all trains in queues
         pthread_mutex_lock(&m);
 
@@ -109,10 +106,6 @@ void ArriveBridge ( TrainInfo *train )
  */
 void CrossBridge ( TrainInfo *train )
 {
-	printf ("Train %2d is ON the bridge (%s)\n", train->trainId,
-			(train->direction == DIRECTION_WEST ? "West" : "East"));
-	fflush(stdout);
-	
 	/* 
 	 * This sleep statement simulates the time it takes to 
 	 * cross the bridge.  Longer trains take more time.
@@ -143,7 +136,7 @@ void LeaveBridge ( TrainInfo *train )
     if(East->next)
       East = East->next;
     e_count--;
-    e_count_max++;
+    if(w_count != 0) e_count_max++;
   }
 
   if((e_count_max >=2 || e_count==0) && w_count!=0){
@@ -199,10 +192,6 @@ int main ( int argc, char *argv[] )
 	{
 		TrainInfo *info = createTrain();
 		
-		printf ("Train %2d headed %s length is %d\n", info->trainId,
-			(info->direction == DIRECTION_WEST ? "West" : "East"),
-			info->length );
-
 		if ( pthread_create (&tids[i],0, Train, (void *)info) != 0 )
 		{
 			printf ("Failed creation of Train.\n");
@@ -221,4 +210,3 @@ int main ( int argc, char *argv[] )
 	free(tids);
 	return 0;
 }
-
