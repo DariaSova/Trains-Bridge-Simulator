@@ -1,10 +1,3 @@
-/*
- * assign2.c
- *
- * Name:
- * Student Number:
- */
-
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h> 
@@ -22,14 +15,6 @@ struct node {
   int id;
   struct node *next;
 }*East, *West, *west_temp, *east_temp;
-/*
- * If you uncomment the following line, some debugging
- * output will be produced.
- *
- * Be sure to comment this line out again before you submit 
- */
-
-/* #define DEBUG	1 */ 
 
 void ArriveBridge (TrainInfo *train);
 void CrossBridge (TrainInfo *train);
@@ -43,88 +28,79 @@ void LeaveBridge (TrainInfo *train);
  */
 void * Train ( void *arguments )
 {
-	TrainInfo	*train = (TrainInfo *)arguments;
+  TrainInfo	*train = (TrainInfo *)arguments;
 
-	/* Sleep to simulate different arrival times */
-	usleep (train->length*SLEEP_MULTIPLE);
+  /* Sleep to simulate different arrival times */
+  usleep (train->length*SLEEP_MULTIPLE);
 
-	ArriveBridge (train);
-	CrossBridge  (train);
-	LeaveBridge  (train); 
+  ArriveBridge (train);
+  CrossBridge  (train);
+  LeaveBridge  (train); 
 
-	/* I decided that the paramter structure would be malloc'd 
-	 * in the main thread, but the individual threads are responsible
-	 * for freeing the memory.
-	 *
-	 * This way I didn't have to keep an array of parameter pointers
-	 * in the main thread.
-	 */
-	free (train);
-	return NULL;
+  /* I decided that the paramter structure would be malloc'd 
+   * in the main thread, but the individual threads are responsible
+   * for freeing the memory.
+   *
+   * This way I didn't have to keep an array of parameter pointers
+   * in the main thread.
+   */
+  free (train);
+  return NULL;
 }
 
-/*
- * You will need to add code to this function to ensure that
- * the trains cross the bridge in the correct order.
- */
 void ArriveBridge ( TrainInfo *train )
 {
-        //put all trains in queues
-        pthread_mutex_lock(&m);
+  //put all trains in queues
+  pthread_mutex_lock(&m);
 
-        struct node *current = (struct node *)malloc(1*sizeof(struct node));
-        current->id = train->trainId;
-        current->next = NULL;
+  struct node *current = (struct node *)malloc(1*sizeof(struct node));
+  current->id = train->trainId;
+  current->next = NULL;
 
-        if(train->direction == 2) {
-          if(e_count==0)
-            East = current;
-          else east_temp->next = current;
-          east_temp = current;
-          e_count++;
-        }else {
-          if(w_count==0)
-            West = current;
-          else west_temp->next = current;
-          west_temp = current;
-          w_count++;
-        }
-        
-        if(turn_id==-1) {
-          turn_id = train -> trainId;
-        }
+  if(train->direction == 2) {
+    if(e_count==0)
+      East = current;
+    else east_temp->next = current;
+    east_temp = current;
+    e_count++;
+  }else {
+    if(w_count==0)
+      West = current;
+    else west_temp->next = current;
+    west_temp = current;
+    w_count++;
+  }
 
-        pthread_mutex_unlock(&m);
+  if(turn_id==-1) {
+    turn_id = train -> trainId;
+  }
 
-        pthread_mutex_lock(&m);
-        while(turn_id!=train->trainId){
-          pthread_cond_wait(&c,&m);
-        }
-        pthread_mutex_unlock(&m);
+  pthread_mutex_unlock(&m);
+
+  pthread_mutex_lock(&m);
+  while(turn_id!=train->trainId){
+    pthread_cond_wait(&c,&m);
+  }
+  pthread_mutex_unlock(&m);
 
 }
 
 /*
- * Simulate crossing the bridge.  You shouldn't have to change this
- * function.
+ * Simulate crossing the bridge
  */
 void CrossBridge ( TrainInfo *train )
 {
-	/* 
-	 * This sleep statement simulates the time it takes to 
-	 * cross the bridge.  Longer trains take more time.
-	 */
-	usleep (train->length*SLEEP_MULTIPLE);
+  /* 
+   * This sleep statement simulates the time it takes to 
+   * cross the bridge.  Longer trains take more time.
+   */
+  usleep (train->length*SLEEP_MULTIPLE);
 
-	printf ("Train %2d is OFF the bridge(%s)\n", train->trainId, 
-			(train->direction == DIRECTION_WEST ? "West" : "East"));
-	fflush(stdout);
+  printf ("Train %2d is OFF the bridge(%s)\n", train->trainId, 
+      (train->direction == DIRECTION_WEST ? "West" : "East"));
+  fflush(stdout);
 }
 
-/*
- * Add code here to make the bridge available to waiting
- * trains...
- */
 void LeaveBridge ( TrainInfo *train )
 {
   pthread_mutex_lock(&m);
@@ -156,63 +132,53 @@ void LeaveBridge ( TrainInfo *train )
 
 int main ( int argc, char *argv[] )
 {
-	int		trainCount = 0;
-	char 		*filename = NULL;
-	pthread_t	*tids;
-	int		i;
+  int		trainCount = 0;
+  char 		*filename = NULL;
+  pthread_t	*tids;
+  int		i;
 
-		
-	/* Parse the arguments */
-	if ( argc < 2 )
-	{
-		printf ("Usage: part1 n {filename}\n\t\tn is number of trains\n");
-		printf ("\t\tfilename is input file to use (optional)\n");
-		exit(0);
-	}
-	
-	if ( argc >= 2 )
-	{
-		trainCount = atoi(argv[1]);
-	}
-	if ( argc == 3 )
-	{
-		filename = argv[2];
-	}	
-	
-	initTrain(filename);
-	
-	/*
-	 * Since the number of trains to simulate is specified on the command
-	 * line, we need to malloc space to store the thread ids of each train
-	 * thread.
-	 */
-	tids = (pthread_t *) malloc(sizeof(pthread_t)*trainCount);
-	
-	/*
-	 * Create all the train threads pass them the information about
-	 * length and direction as a TrainInfo structure
-	 */
-	for (i=0;i<trainCount;i++)
-	{
-		TrainInfo *info = createTrain();
-		
-		if ( pthread_create (&tids[i],0, Train, (void *)info) != 0 )
-		{
-			printf ("Failed creation of Train.\n");
-			exit(0);
-		}
-	}
 
-	/*
-	 * This code waits for all train threads to terminate
-	 */
-	for (i=0;i<trainCount;i++)
-	{
-		pthread_join (tids[i], NULL);
-	}
-	
-	free(tids);
-        free(East);
-        free(West);
-	return 0;
+  /* Parse the arguments */
+  if ( argc < 2 )
+  {
+    printf ("Usage: part1 n {filename}\n\t\tn is number of trains\n");
+    printf ("\t\tfilename is input file to use (optional)\n");
+    exit(0);
+  }
+
+  if ( argc >= 2 )
+  {
+    trainCount = atoi(argv[1]);
+  }
+  if ( argc == 3 )
+  {
+    filename = argv[2];
+  }	
+
+  initTrain(filename);
+  tids = (pthread_t *) malloc(sizeof(pthread_t)*trainCount);
+
+  for (i=0;i<trainCount;i++)
+  {
+    TrainInfo *info = createTrain();
+
+    if ( pthread_create (&tids[i],0, Train, (void *)info) != 0 )
+    {
+      printf ("Failed creation of Train.\n");
+      exit(0);
+    }
+  }
+
+  /*
+   * This code waits for all train threads to terminate
+   */
+  for (i=0;i<trainCount;i++)
+  {
+    pthread_join (tids[i], NULL);
+  }
+
+  free(tids);
+  free(East);
+  free(West);
+  return 0;
 }

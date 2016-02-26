@@ -1,0 +1,13 @@
+#!/bin/bash
+make
+./assign2 3 tests/t0.txt | grep OFF > tests/0.txt
+./assign2 7 tests/t1.txt | grep OFF > tests/1.txt
+./assign2 8 tests/t2.txt | grep OFF > tests/2.txt
+./assign2 5 tests/t3.txt | grep OFF > tests/3.txt 
+./assign2 12 tests/t4.txt | grep OFF > tests/4.txt
+
+diff tests/t0_sol.txt tests/0.txt
+diff tests/t1_sol.txt tests/1.txt
+diff tests/t2_sol.txt tests/2.txt
+diff tests/t3_sol.txt tests/3.txt
+diff tests/t4_sol.txt tests/4.txt

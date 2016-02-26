@@ -1,50 +1,35 @@
-/*
- * train.c
- */
- 
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "train.h"
- 
+
 /* A global to assign IDs to our trains */ 
 int idNumber = 0;
-
-/* If this value is set to 1, trains lengths
- * etc will be generated randomly.
- * 
- * If it is set to 0, the lengths etc will be
- * input from a file.
- */
 int doRandom = 0;
 
 /* The file to input train data from */
 FILE *inputFile;
 char ch[80];
 
-/* You can assume that no more than 80 characters
- * will be on any line in the input file
- */
 #define MAXLINE		80
 
 void	initTrain ( char *filename )
 {
-	doRandom = 0;
+  doRandom = 0;
 
-	
-	/* If no filename is specified, generate randomly */
-	if ( !filename )
-	{
-		doRandom = 1;
-		srandom(getpid());
-	}
-	else
-	{
 
-                inputFile = fopen(filename, "r");
+  /* If no filename is specified, generate randomly */
+  if ( !filename )
+  {
+    doRandom = 1;
+    srandom(getpid());
+  }
+  else
+  {
 
-                //fclose(inputFile);
-        }
+    inputFile = fopen(filename, "r");
+
+  }
 }
 
 /*
