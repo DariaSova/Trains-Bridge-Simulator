@@ -208,5 +208,7 @@ int main ( int argc, char *argv[] )
 	}
 	
 	free(tids);
+        free(East);
+        free(West);
 	return 0;
 }
